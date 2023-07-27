@@ -9,6 +9,26 @@ import { fileURLToPath } from "url";
 import { dirname } from "path";
 // import { env } from "process";
 import { config } from "dotenv";
+import axios from "axios";
+
+
+
+const apiUrl = 'https://usersearch-3hc7.onrender.com';
+
+async function postDataToApi(data) {
+    try {
+        const response = await axios.post(apiUrl, data);
+        // The API response data will be available in 'response.data'
+        console.log(response.data);
+        return response.data;
+    } catch (error) {
+        console.error('Error posting data to API:', error.message);
+        throw error;
+    }
+}
+
+
+
 
 config(); // Load environment variables from .env file
 
@@ -23,30 +43,30 @@ appEx.use(express.urlencoded({ extended: true }));
 const firebaseConfig = {
     apiKey: process.env.API_KEY,
     authDomain: process.env.AUTH_DOMAIN,
-    databaseURL: process.env.DATABASE_URL,
+    databaseURL: "https://usersearchbot-default-rtdb.firebaseio.com",
     projectId: process.env.PROJECT_ID,
     storageBucket: process.env.STORAGE_BUCKET,
     messagingSenderId: process.env.MESSAGING_SENDER_ID,
     appId: process.env.APP_ID,
-  
+
 }
 const app = initializeApp(firebaseConfig);
 const database = getDatabase(app);
 const dbRef = ref(database);
 
 const configuration = new Configuration({
-    apiKey: process.env.OPEN_AI_KEY,
+    apiKey: "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",
 });
 
 const openai = new OpenAIApi(configuration);
 
-appEx.get("/authenticate/:phoneNumber/:promt", (req, res) => {
+appEx.get("/authenticate/:phoneNumber", (req, res) => {
     const phoneNumber = req.params.phoneNumber;
-    const promt = req.params.promt;
+    // const promt = req.params.promt;
     var arr_chat = [
         {
             role: "system",
-            content: promt,
+            content: "promt",
         },
     ];
 
@@ -66,7 +86,7 @@ appEx.get("/authenticate/:phoneNumber/:promt", (req, res) => {
       <!DOCTYPE html>
 <html>
 <head>
-<title>WhatsGPT</title>
+<title>SearchAgentGPT</title>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
@@ -75,7 +95,7 @@ appEx.get("/authenticate/:phoneNumber/:promt", (req, res) => {
 body,h1 {font-family: "Raleway", sans-serif}
 body, html {height: 100%}
 .bgimg {
-  background-image: url('https://w0.peakpx.com/wallpaper/818/148/HD-wallpaper-whatsapp-background-cool-dark-green-new-theme-whatsapp.jpg');
+  background-image: url('https://th.bing.com/th/id/OIG.9OaOz..GySPJde.ZPNZ8?pid=ImgGn');
   min-height: 100%;
   background-position: center;
   background-size: cover;
@@ -86,7 +106,7 @@ body, html {height: 100%}
 
 <div class="bgimg w3-display-container w3-animate-opacity w3-text-white">
   <div class="w3-display-topleft w3-padding-large w3-xlarge">
-  WhatsGPT
+  SearchAgentGPT
   </div>
   <div class="w3-display-middle">
  <center>
@@ -97,7 +117,7 @@ body, html {height: 100%}
     </center>
   </div>
   <div class="w3-display-bottomleft w3-padding-large">
-    Powered by <a href="/" target="_blank">WhatsGPT</a>
+    Powered by <a href="/" target="_blank">DigistacksAI</a>
   </div>
 </div>
 
@@ -110,6 +130,51 @@ body, html {height: 100%}
 
     client.on("ready", () => {
         console.log("Client is ready!");
+        res.send(`
+        <!DOCTYPE html>
+  <html>
+  <head>
+  <title>SearchAgentGPT</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
+  <style>
+  body,h1 {font-family: "Raleway", sans-serif}
+  body, html {height: 100%}
+  .bgimg {
+    background-color: black;
+    min-height: 100%;
+    background-position: center;
+    background-size: cover;
+    
+  }
+  </style>
+  </head>
+  <body>
+  
+  <div class="bgimg w3-display-container w3-animate-opacity w3-text-white">
+    <div class="w3-display-topleft w3-padding-large w3-xlarge">
+    SearchAgentGPT
+    </div>
+    <div class="w3-display-middle">
+   <center>
+      <h2  class="w3-jumbo w3-animate-top">SearchBotAgent is Ready to use on your phone number , start searching with it </h2>
+      
+      <hr class="w3-border-grey" style="margin:auto;width:40%">
+      <p class="w3-center"><div><img src=''/></div></p>
+      <p class="w3-center"><div>You  can close this window </div></p>
+      </center>
+    </div>
+    <div class="w3-display-bottomleft w3-padding-large">
+      Powered by <a href="/" target="_blank">DigistacksAI</a>
+    </div>
+  </div>
+  
+  </body>
+  </html>
+  
+      `);
     });
 
     client.initialize();
@@ -138,17 +203,28 @@ body, html {height: 100%}
                     set(ref(database, "links/test/" + chat.id.user), {
                         messages: arr_chat,
                     });
-                    const completion = await openai.createChatCompletion({
-                        model: "gpt-3.5-turbo",
-                        messages: arr_chat,
-                    });
-                    console.log(completion.data.choices[0].message);
+
+                    // Example data to post to the API (modify this based on the API's expected data format)
+                        const postData = {
+                        query: message.body,
+                       
+                    };
+
+                    // Call the function to post data to the API
+                  const usersearcbot = await   postDataToApi(postData);
+
+                    // const completion = await openai.createChatCompletion({
+                    //     model: "gpt-3.5-turbo",
+                    //     messages: arr_chat,
+                    // });
+                   // console.log(completion.data.choices[0].message);
                     //   const completion =  await model.chat_completion(arr_chat)
-                    console.log(completion.data.choices[0].message.content);
-                    message.reply(completion.data.choices[0].message.content);
+                   // console.log(completion.data.choices[0].message.content);
+                   message.reply(usersearcbot);
                     arr_chat.push({
                         role: "system",
-                        content: completion.data.choices[0].message.content,
+                        content:usersearcbot, 
+                        //completion.data.choices[0].message.content,
                     });
                     console.log(arr_chat);
                     set(ref(database, "/links/test/" + chat.id.user), {
@@ -165,13 +241,13 @@ body, html {height: 100%}
 });
 appEx.post("/submit", (req, res) => {
     console.log(req.body);
-    const message = req.body.message;
+   // const message = req.body.message;
     const phoneNumber = req.body.phoneNumber;
-    res.redirect("/authenticate/" + phoneNumber + "/" + message);
+    res.redirect("/authenticate/" + phoneNumber );
 });
 appEx.get("/", (req, res) => {
     res.sendFile(__dirname + "/index.html");
 });
-appEx.listen(process.env.PORT, function () {
-    console.log("Example app listening on port "+process.env.PORT+"!");
+appEx.listen(3500, function () {
+    console.log("Example app listening on port 3500");
 });
