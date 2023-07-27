@@ -41,21 +41,20 @@ appEx.use(express.urlencoded({ extended: true }));
 
 // TODO: Replace the following with your app's Firebase project configuration
 const firebaseConfig = {
-    apiKey: process.env.API_KEY,
+    apiKey:"AIzaSyDPGOWSdqQzHZfsQFPhutxWU5srjwnlx44",
     authDomain: process.env.AUTH_DOMAIN,
     databaseURL: "https://usersearchbot-default-rtdb.firebaseio.com",
-    projectId: process.env.PROJECT_ID,
-    storageBucket: process.env.STORAGE_BUCKET,
-    messagingSenderId: process.env.MESSAGING_SENDER_ID,
-    appId: process.env.APP_ID,
-
+    projectId: "usersearchbot",
+    storageBucket: "usersearchbot.appspot.com",
+    messagingSenderId: "43099695393",
+    appId:"1:43099695393:web:2456df6edd2ec129433660",
 }
 const app = initializeApp(firebaseConfig);
 const database = getDatabase(app);
 const dbRef = ref(database);
 
 const configuration = new Configuration({
-    apiKey: "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",
+    apiKey: process.env.OPEN_AI_KEY,
 });
 
 const openai = new OpenAIApi(configuration);
